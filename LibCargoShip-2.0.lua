@@ -123,8 +123,8 @@ end
 	lib:GetUnused()
 		Return a table of all unused dataobjects
 *******************************]]
+local unused = {}
 function lib:GetUnused()
-	local unused = {}
 	for name, dataobj in LDB:DataObjectIterator() do
 		if(not objects[name]) then unused[name] = dataobj else unused[name] = nil end
 	end
