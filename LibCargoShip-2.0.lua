@@ -75,7 +75,11 @@ end
 		If it does not exist, it will be created with the defined arguments
 *******************************]]
 function lib:Create(name, opt)
-	if(not name or strlen(name)<1) then return nil end
+	if(type(name) == "table" and not opt) then
+		opt = name
+		name = opt.name
+	end
+	if(not name or name:len() < 1) then return end
 	opt = opt or defaults
 
 	local object = CreateFrame("Button", nil, opt.parent or UIParent)
