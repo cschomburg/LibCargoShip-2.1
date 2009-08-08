@@ -1,6 +1,6 @@
 assert(LibStub, "LibCargoShip-2.0 requires LibStub")
 local LDB = LibStub:GetLibrary("LibDataBroker-1.1")
-local lib, oldminor = LibStub:NewLibrary("LibCargoShip-2.0", 1)
+local lib, oldminor = LibStub:NewLibrary("LibCargoShip-2.0", 2)
 if(not lib) then return end
 
 --[[
