@@ -1,6 +1,5 @@
 assert(LibStub, "LibCargoShip-2.0 requires LibStub")
-assert(LibStub:GetLibrary("LibDataBroker-1.1", true), "LibCargoShip-2.0 requires LibDataBroker-1.1")
-
+local LDB = LibStub:GetLibrary("LibDataBroker-1.1")
 local lib, oldminor = LibStub:NewLibrary("LibCargoShip-2.0", 1)
 if(not lib) then return end
 
@@ -10,7 +9,6 @@ if(not lib) then return end
 
 local obj, dataobj, unused
 local _G = getfenv(0)
-local LDB = LibStub:GetLibrary("LibDataBroker-1.1")
 local defaults = {}
 local objects = {}
 local updateFunctions
