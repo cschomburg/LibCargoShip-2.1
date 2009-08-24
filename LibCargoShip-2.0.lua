@@ -1,6 +1,6 @@
 assert(LibStub, "LibCargoShip-2.0 requires LibStub")
 local LDB = LibStub:GetLibrary("LibDataBroker-1.1")
-local lib, oldminor = LibStub:NewLibrary("LibCargoShip-2.0", 2)
+local lib, oldminor = LibStub:NewLibrary("LibCargoShip-2.0", 3)
 if(not lib) then return end
 
 --[[
@@ -9,7 +9,19 @@ if(not lib) then return end
 
 local obj, dataobj, unused
 local _G = getfenv(0)
-local defaults = {}
+local defaults = {__index={
+	parent = UIParent,
+	width = 70,
+	height = 12,
+	scale = 1,
+	alpha = 1,
+	fontObject = nil,
+	font = "Fonts\\FRIZQT__.TTF",
+	fontSize = 10,
+	fontStyle = nil,
+	noShadow = nil,
+}}
+local dummy = {}
 local objects = {}
 local updateFunctions
 
@@ -30,7 +42,7 @@ function lib:Style(object, opt)
 	if(not opt.noText) then	-- Text right
 		object.Text = object:CreateFontString(nil, "OVERLAY", opt.fontObject)
 		if(not opt.fontObject) then
-			object.Text:SetFont(opt.font or "Fonts\\FRIZQT__.TTF", opt.fontSize or 10, opt.fontStyle)
+			object.Text:SetFont(opt.font, opt.fontSize, opt.fontStyle)
 			if(not opt.noShadow) then
 				object.Text:SetShadowOffset(1, -1)
 			end
@@ -78,10 +90,11 @@ function lib:Create(name, opt)
 		name = opt.name
 	end
 	if(not name or name:len() < 1) then return end
-	opt = opt or defaults
+	setmetatable(opt or dummy, defaults)
 
-	local object = CreateFrame("Button", nil, opt.parent or UIParent)
+	local object = CreateFrame("Button", nil, opt.parent)
 	object:RegisterForClicks("anyUp")
+	object.TagString = tagString
 	object.Formatting = opt.formatting
 	object.Name = name
 	objects[name] = objects[name] or {}
@@ -183,9 +196,9 @@ updateFunctions = {
 	end,
 	["text"] = function(self, attr, dataobj)
 		if(not self.Text) then return end
-		if(self.Tags) then
+		if(self.TagString) then
 			taggedObject = self
-			local text = self.Tags:gsub("%[(%w+)%]", tag)
+			local text = self.TagString:gsub("%[(%w+)%]", tag)
 			self.Text:SetText(text)
 		elseif(self.Formatting) then
 			if(self.useLabel) then
