@@ -24,6 +24,7 @@ local defaults = {__index={
 local dummy = {}
 local objects = {}
 local updateFunctions
+local assertf = function(cond, ...) return assert(cond, format(...)) end
 
 function lib:Style(object, opt)
 	-- Default dimensions
@@ -80,17 +81,19 @@ local function initBlock(self, dataobj)
 end
 
 --[[*****************************
-	lib:CreateBlock(name [, noIcon, noLabel, formatting])
-		Attempts to return the frame which is used by dataobject "name"
-		If it does not exist, it will be created with the defined arguments
+	lib:CreateBlock(name [, options])
+	lib:CreateBlock(options)
+		Creates a new block from the DataObject of the same name
+		The name can either be delivered as arg #1, making the options-table optional
+		or defined in options.name, where options is passed as arg #1
 *******************************]]
 function lib:Create(name, opt)
 	if(type(name) == "table" and not opt) then
 		opt = name
 		name = opt.name
 	end
-	if(not name or name:len() < 1) then return end
-	setmetatable(opt or dummy, defaults)
+	assertf(name, "Bad argument #1 to 'Create' (string expected, got %s", type(name))
+	opt = setmetatable(opt or dummy, defaults)
 
 	local object = CreateFrame("Button", nil, opt.parent)
 	object:RegisterForClicks("anyUp")
@@ -124,7 +127,7 @@ function lib:Get(name) return objects[name] end
 *******************************]]
 function lib:PrintUnused()
 	local text
-	for name, _ in LDB:DataObjectIterator() do
+	for name in LDB:DataObjectIterator() do
 		if(not objects[name]) then text = (text and text..", " or "")..name end
 	end
 	print("|cffee8800cargoShip:|r "..(text or "No unused dataobjects found"))
