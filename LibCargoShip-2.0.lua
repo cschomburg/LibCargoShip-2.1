@@ -92,7 +92,7 @@ function lib:Create(name, opt)
 		opt = name
 		name = opt.name
 	end
-	assertf(name, "Bad argument #1 to 'Create' (string expected, got %s", type(name))
+	assertf(name, "Bad argument #1 to 'Create' (string expected, got %s)", type(name))
 	opt = setmetatable(opt or dummy, defaults)
 
 	local object = CreateFrame("Button", nil, opt.parent)
