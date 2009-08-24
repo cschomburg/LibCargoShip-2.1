@@ -156,7 +156,10 @@ local function hideTooltip(self)
 	frame:Hide()
 end
 
-
+local taggedObject
+local function tag(word)
+	return taggedObject.DataObject[word] or taggedObject[word]
+end
 
 --[[##################################
 	UPDATE FUNCTIONS
@@ -180,11 +183,15 @@ updateFunctions = {
 	end,
 	["text"] = function(self, attr, dataobj)
 		if(not self.Text) then return end
-		if(self.Formatting) then
+		if(self.Tags) then
+			taggedObject = self
+			local text = self.Tags:gsub("%[(%w+)%]", tag)
+			self.Text:SetText(text)
+		elseif(self.Formatting) then
 			if(self.useLabel) then
-				self.Text:SetFormattedText(self.Formatting, dataobj.label or name, dataobj.value, dataobj.suffix)
+				self.Text:SetFormattedText(self.Formatting, dataobj.label or self.Name, dataobj.value, dataobj.suffix)
 			else
-				self.Label:SetFormattedText(self.Formatting, dataobj.value, dataobj.suffix)
+				self.Text:SetFormattedText(self.Formatting, dataobj.value, dataobj.suffix)
 			end
 		else
 			local text = self.useLabel and (dataobj.label or self.Name) or ""
