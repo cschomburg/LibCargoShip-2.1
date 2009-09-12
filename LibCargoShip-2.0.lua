@@ -1,3 +1,11 @@
+--[[
+Name: LibCargoShip-1.0
+Author: Cargor (xconstruct@gmail.com)
+Dependencies: LibStub, LibDataBroker-1.1
+License: GPL 2
+Description: LibDataBroker block display library
+]]
+
 assert(LibStub, "LibCargoShip-2.0 requires LibStub")
 local LDB = LibStub:GetLibrary("LibDataBroker-1.1")
 local lib, oldminor = LibStub:NewLibrary("LibCargoShip-2.0", 3)
