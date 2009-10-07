@@ -8,7 +8,7 @@ Description: LibDataBroker block display library
 
 assert(LibStub, "LibCargoShip-2.1 requires LibStub")
 local LDB = LibStub:GetLibrary("LibDataBroker-1.1")
-local lib, oldminor = LibStub:NewLibrary("LibCargoShip-2.1", 3)
+local lib, oldminor = LibStub:NewLibrary("LibCargoShip-2.1", 4)
 if(not lib) then return end
 
 local defaults = {__index={
@@ -24,6 +24,7 @@ local defaults = {__index={
 	noShadow = nil,
 }}
 
+local getDataObject
 local objects = {}
 local updateFunctions = {}
 local assertf = function(cond, ...) return assert(cond, format(...)) end
@@ -34,9 +35,8 @@ lib.Objects = objects
 
 --[[*****************************
 	lib:CreateBlock([name] [, options])
-	lib:CreateBlock([options])
 		Creates a new block from the DataObject of the same name
-		The name can either be delivered as arg #1, making the options-table optional
+		The name can either be delivered as arg #1, making the options-table optional,
 		or defined in options.name, where options is passed as arg #1
 *******************************]]
 function lib:CreateBlock(name, opt)
@@ -61,22 +61,45 @@ function lib:CreateBlock(name, opt)
 end
 setmetatable(lib, {__call = lib.CreateBlock})
 
-function lib:Get(name) return objects[name] end
-function lib:GetFirst(name) return objects[name] and next(objects[name]) end
+--[[*****************************
+	lib:Get(dataObject)
+		Return a table of all current blocks using the defined dataObject
+*******************************]]
+function lib:Get(arg1)
+	local name = getDataObject(arg1)
+	return name and objects[name]
+end
 
 --[[*****************************
-	lib:GetUnused()
-		Return a table of all unused dataobjects
+	lib:GetFirst(dataObject)
+		Convenience function, get the first block using the dataObject
+*******************************]]
+function lib:GetFirst(arg1)
+	local name = getDataObject(arg1)
+	return name and objects[name] and next(objects[name])
+end
+
+--[[*****************************
+	lib:GetUnused(verbose)
+		Return a table of all unused dataobjects and (optionally) prints them to the chat
 *******************************]]
 local unused
-function lib:GetUnused()
+function lib:GetUnused(verbose)
 	unused = unused or {}
+	if(verbose) then print("Unused LDB objects:") end
 	for name, dataobj in LDB:DataObjectIterator() do
 		unused[name] = not objects[name] and dataobj
+		if(verbose and unused[name]) then
+			print(name)
+		end
 	end
 	return unused
 end
 
+--[[*****************************
+	lib:Embed(target)
+		Embeds the library functions in your own frame/table
+*******************************]]
 function lib:Embed(target)
 	for k,v in pairs(lib) do
 		target[k] = v
@@ -91,11 +114,19 @@ LDB.RegisterCallback(lib, "LibDataBroker_DataObjectCreated", function (event, na
 end)
 
 --[[##################################
-	Prototype Functions
+	Block Prototype Functions
 ###################################]]
 
 Prototype.UpdateFunctions = updateFunctions
 
+--[[*****************************
+	Prototype:SetDataObject([dataObject])
+		Sets the prototype's displayed dataObject
+	Returns:
+		true: dataObject set
+		false: waiting for dataobject to be created
+		nil: no dataObject set
+*******************************]]
 function Prototype:SetDataObject(arg1)
 	if(self.DataObject) then
 		self.DataObject = nil
@@ -106,12 +137,7 @@ function Prototype:SetDataObject(arg1)
 
 	if(not arg1) then return end
 
-	local name, dataobj
-	if(type(arg1) == "table") then
-		name, dataobj = LDB:GetNameByDataObject(arg1), arg1
-	else
-		name, dataobj = arg1, LDB:GetDataObjectByName(arg1)
-	end
+	local name, dataobj = getDataObject(arg1)
 
 	self.name = name
 	objects[name] = objects[name] or {}
@@ -125,6 +151,10 @@ function Prototype:SetDataObject(arg1)
 	return true
 end
 
+--[[*****************************
+	Prototype:Update("attribute" or nil)
+		Update one or all attributes from the dataobject
+*******************************]]
 function Prototype:Update(attr)
 	if(attr) then
 		if(self.UpdateFunctions and self.UpdateFunctions[attr]) then
@@ -142,6 +172,10 @@ function Prototype:AttributeChanged(event, name, attr, value, dataobj)
 	self:Update(attr, dataobj)
 end
 
+--[[*****************************
+	Prototype:Style(optionsTable)
+		Callback to initialize and style the block
+*******************************]]
 function Prototype:Style(opt)
 	-- Default dimensions
 	self:SetWidth(opt.width)
@@ -179,6 +213,14 @@ end
 --[[##################################
 	Private Object Functions
 ###################################]]
+
+getDataObject = function(arg1)
+	if(type(arg1) == "table") then
+		return LDB:GetNameByDataObject(arg1), arg1
+	else
+		return arg1, LDB:GetDataObjectByName(arg1)
+	end
+end
 
 local function getTipAnchor(frame)
 	local x,y = frame:GetCenter()

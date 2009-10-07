@@ -1,0 +1,92 @@
+LibCargoShip-2.1
+================
+
+A library for creating and updating blocks of LibDataBroker objects.
+It currently supports the following attributes:
+
+*	icon, iconR, iconB, iconG, iconCoords
+*	text, label, value, suffix
+*	OnEnter, OnLeave, OnClick
+*	tooltip, OnTooltipShow
+
+*Licensed under the open-source GPL 2*
+
+Core API
+--------
+
+### lib = LibStub("LibCargoShip-2.1") ###
+Fetch the library
+
+### block = lib:CreateBlock([name] [, options]) ###
+Creates a new block from the DataObject of the same name.
+The name can either be delivered as arg #1, making the options-table optional,
+or defined in options.name, where options is passed as arg #1
+
+*	name: the name of the dataObject to be used (optional)
+*	options: table holding additional style options
+
+### table = lib:Get(dataObject) ###
+Returns a table of all current blocks using the defined dataObject
+
+*	dataObject: the dataObject to be used (either object or name)
+
+### block = lib:GetFirst(dataObject) ###
+Convenience function, returns the first blocks using the defined dataObject
+
+*	dataObject: the dataObject to be used (either object or name)
+
+### table = lib:GetUnused([verbose]) ###
+Returns a table of all unused dataObjects
+
+*	verbose: print the names to the chatframe (optional)
+
+### lib:Embed(target) ###
+Embeds the library functions in your own frame/table
+
+*	target: your target frame or table
+
+Block API
+--------
+
+### success = block:SetDataObject([dataObject]) ###
+Sets the prototype's displayed dataObject
+
+*	dataObject: the dataObject to be used (either object or name; optional)
+
+### block:Update([attribute]) ###
+Update one or all attributes from the dataobject
+
+*	attribute: the name of the dataobjects attribute; if not defined, all attributes will be updated
+
+### block:Style(options) ###
+Callback to initialize and style the block
+
+*	options: table holding additional options
+
+Example
+-------
+	local LCS = LibStub("LibCargoShip-2.1")
+	local friends = LCS{
+		name = "picoFriends",
+		noIcon = true,
+		scale = 1.5,
+	}
+	friends:SetPoint("BOTTOM", 0, 10)
+Creates a block of picoFriends at the bottom of the screen, scaled 1.5 with no icon
+
+	local LCS = LibStub("LibCargoShip-2.1")
+	local friends = LCS:CreateBlock("picoFriends", {
+		noIcon = true,
+		scale = 1.5,
+	})
+	friends:SetPoint("BOTTOM", 0, 10)
+Same example with a more clear form of spelling
+
+	local LCS = LibStub("LibCargoShip-2.1")
+	local block = LCS:CreateBlock{
+		noIcon = true,
+		scale = 1.5,
+	}
+	block:SetDataObject("picoFriends")
+	block:SetPoint("BOTTOM", 0, 10)
+Another one. You can change the dataObject even after the block was created. Carousel anyone?
