@@ -45,6 +45,28 @@ Embeds the library functions in your own frame/table
 
 *	target: your target frame or table
 
+Valid options
+-------------
+
+*	parent (default: UIParent)
+*	width (default: 70)
+*	height (default: 12)
+*	scale (default: 1)
+*	alpha (default: 1)
+
+*	fontObject (default: nil)
+*	font ( default: "Fonts\\FRIZQT__.TTF")
+*	fontSize (default: 10)
+*	fontStyle (default: nil)
+*	textColor (default: { 1, 1, 1, 1 } = white)
+
+*	noShadow (default: nil)
+*	shadowX (default: 1)
+*	shadowY (default: -1)
+
+*	noIcon (default: nil)
+*	noText (default: nil)
+
 Block API
 --------
 

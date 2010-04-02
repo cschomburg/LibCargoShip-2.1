@@ -8,7 +8,7 @@ Description: LibDataBroker block display library
 
 assert(LibStub, "LibCargoShip-2.1 requires LibStub")
 local LDB = LibStub:GetLibrary("LibDataBroker-1.1")
-local lib, oldminor = LibStub:NewLibrary("LibCargoShip-2.1", 4)
+local lib, oldminor = LibStub:NewLibrary("LibCargoShip-2.1", 5)
 if(not lib) then return end
 
 local defaults = {__index={
@@ -17,11 +17,19 @@ local defaults = {__index={
 	height = 12,
 	scale = 1,
 	alpha = 1,
+
 	fontObject = nil,
 	font = "Fonts\\FRIZQT__.TTF",
 	fontSize = 10,
 	fontStyle = nil,
+	textColor = {1, 1, 1, 1},
+
 	noShadow = nil,
+	shadowX = 1,
+	shadowY = -1,
+
+	noIcon = nil,
+	noText = nil,
 }}
 
 local getDataObject
@@ -196,9 +204,10 @@ function Prototype:Style(opt)
 		if(not opt.fontObject) then
 			text:SetFont(opt.font, opt.fontSize, opt.fontStyle)
 			if(not opt.noShadow) then
-				text:SetShadowOffset(1, -1)
+				text:SetShadowOffset(opt.shadowX, opt.shadowY)
 			end
 		end
+		text:SetTextColor(unpack(opt.textColor))
 		text:SetJustifyH("CENTER")
 		if(self.Icon) then	-- Don't overlap the icon!
 			text:SetPoint("TOPLEFT", self.Icon, "TOPRIGHT", 5, 0)
@@ -207,6 +216,8 @@ function Prototype:Style(opt)
 		end
 		text:SetPoint("BOTTOMLEFT")
 		self.Text = text
+	elseif(self.Icon) then
+		self:SetWidth(opt.height)
 	end
 end
 
@@ -272,7 +283,7 @@ updateFunctions.iconR = function(self, attr, dataobj)
 	end
 updateFunctions.text = function(self, attr, dataobj)
 	if(not self.Text) then return end
-	if(self.TagString) then
+	if(self.tagString) then
 		taggedObject = self
 		local text = self.tagString:gsub("%[(%w+)%]", tag)
 		self.Text:SetText(text)
